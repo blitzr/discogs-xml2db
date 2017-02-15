@@ -48,8 +48,10 @@ data_quality_values = ( 'Needs Vote',
 
 def first_file_match(file_pattern):
 	global options
-	matches = filter(lambda f: file_pattern in f, options.file)
-	return matches[0] if len(matches) > 0 else None
+	for f in options.file:
+		if file_pattern in f:
+			return f
+	return None
 
 
 def parseArtists(parser, exporter):
@@ -179,7 +181,7 @@ def select_exporter(options):
 	if options.output is None:
 		return exporters['json']
 
-	if exporters.has_key(options.output):
+	if options.output in exporters:
 		return exporters[options.output]
 	# should I be throwing an exception here?
 	return exporters['json']
@@ -189,8 +191,8 @@ def make_exporter(options):
 
 	parts = exp_module.split('.')
 	m = __import__('.'.join(parts[:-1]))
-	for i in xrange(1, len(parts)):
-		m = getattr(m, parts[i])
+	for p in parts[1:]:
+		m = getattr(m, p)
 
 	data_quality = list(x.strip().lower() for x in (options.data_quality or '').split(',') if x)
 	return m(options.params, data_quality=data_quality)
@@ -212,7 +214,7 @@ that --params is used, e.g.:
 --params "http://localhost:5353/"
 '''
 			)
-	opt_parser.add_argument('-n', type=int, help='Number of records to parse')
+	opt_parser.add_argument('-n', type=int, help='Number of records to parse', default=0)
 	opt_parser.add_argument('-d', '--date', help='Date of release. For example 20110301')
 	opt_parser.add_argument('-o', '--output', choices=exporters.keys(), default='json', help='What to output to')
 	opt_parser.add_argument('-p', '--params', help='Parameters for output, e.g. connection string')
