@@ -13,7 +13,7 @@ import xml.sax
 from discogsreleaseparser import ReleaseHandler
 from jsonexporter import JsonConsoleExporter
 
-from utils import get_latest_dumps
+from .utils import get_latest_dumps
 
 
 class TestMasterHandler(unittest.TestCase):
