@@ -6,4 +6,4 @@ python:
 # before_install:
 #   - sudo apt-get install python-lxml
 install: true
-script: nosetests
+script: travis_wait 60 nosetests
