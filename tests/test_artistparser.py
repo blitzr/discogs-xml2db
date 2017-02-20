@@ -16,7 +16,7 @@ from jsonexporter import JsonConsoleExporter
 from .utils import get_latest_dumps
 
 
-class TestMasterHandler(unittest.TestCase):
+class TestArtistHandler(unittest.TestCase):
 
     def test_parse_first(self):
         parser = xml.sax.make_parser()
