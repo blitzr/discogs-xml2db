@@ -18,32 +18,34 @@ import xml.sax.handler
 import xml.sax
 import sys
 import jsonexporter
-import argparse # in < 2.7 pip install argparse
+import argparse  # in < 2.7 pip install argparse
 import gzip
 
 from os import path
 from model import ParserStopError
 from collections import deque
 
-#sys.setdefaultencoding('utf-8')
+# sys.setdefaultencoding('utf-8')
 options = None
 
-exporters = { 'json': 'jsonexporter.JsonConsoleExporter',
-	'pgsql' : 'postgresexporter.PostgresExporter',
+exporters = {
+	'json': 'jsonexporter.JsonConsoleExporter',
+	'pgsql': 'postgresexporter.PostgresExporter',
 	'pgdump': 'postgresexporter.PostgresConsoleDumper',
-	'couch' : 'couchdbexporter.CouchDbExporter',
-	'mongo' : 'mongodbexporter.MongoDbExporter',
-	}
+	'couch': 'couchdbexporter.CouchDbExporter',
+	'mongo': 'mongodbexporter.MongoDbExporter',
+}
 
 # http://www.discogs.com/help/voting-guidelines.html
-data_quality_values = ( 'Needs Vote',
+data_quality_values = (
+		'Needs Vote',
 		'Complete And Correct',
 		'Correct',
 		'Needs Minor Changes',
 		'Needs Major Changes',
 		'Entirely Incorrect',
 		'Entirely Incorrect Edit'
-		)
+)
 
 
 def first_file_match(file_pattern):
@@ -64,14 +66,14 @@ def parseArtists(parser, exporter):
 		artist_file = in_file
 
 	if artist_file is None:
-		#print("No artist file specified.")
+		# print("No artist file specified.")
 		return
 	elif not path.exists(artist_file):
-		#print("File %s doesn't exist:" % artist_file)
+		# print("File %s doesn't exist:" % artist_file)
 		return
 
 	from discogsartistparser import ArtistHandler
-	artistHandler = ArtistHandler(exporter, stop_after=options.n, ignore_missing_tags = options.ignore_unknown_tags)
+	artistHandler = ArtistHandler(exporter, stop_after=options.n, ignore_missing_tags=options.ignore_unknown_tags)
 	parser.setContentHandler(artistHandler)
 	try:
 		if artist_file.endswith(".gz"):
@@ -81,11 +83,11 @@ def parseArtists(parser, exporter):
 			parser.parse(artist_file)
 	except ParserStopError as pse:
 		print("Parsed %d artists then stopped as requested." % pse.records_parsed)
-#	except model.ParserStopError as pse22:
-#		print("Parsed %d artists then stopped as requested." % pse.records_parsed)
-#	except Exception as ex:
-#		print("Raised unknown error")
-#		print(type(ex))
+# 	except model.ParserStopError as pse22:
+# 		print("Parsed %d artists then stopped as requested." % pse.records_parsed)
+# 	except Exception as ex:
+# 		print("Raised unknown error")
+# 		print(type(ex))
 
 
 def parseLabels(parser, exporter):
@@ -98,14 +100,14 @@ def parseLabels(parser, exporter):
 		label_file = in_file
 
 	if label_file is None:
-		#print("No label file specified.")
+		# print("No label file specified.")
 		return
 	elif not path.exists(label_file):
-		#print("File %s doesn't exist:" % label_file)
+		# print("File %s doesn't exist:" % label_file)
 		return
 
 	from discogslabelparser import LabelHandler
-	labelHandler = LabelHandler(exporter, stop_after=options.n, ignore_missing_tags = options.ignore_unknown_tags)
+	labelHandler = LabelHandler(exporter, stop_after=options.n, ignore_missing_tags=options.ignore_unknown_tags)
 	parser.setContentHandler(labelHandler)
 	try:
 		if label_file.endswith(".gz"):
@@ -127,14 +129,14 @@ def parseReleases(parser, exporter):
 		release_file = in_file
 
 	if release_file is None:
-		#print("No release file specified.")
+		# print("No release file specified.")
 		return
 	elif not path.exists(release_file):
-		#print("File %s doesn't exist:" % release_file)
+		# print("File %s doesn't exist:" % release_file)
 		return
 
 	from discogsreleaseparser import ReleaseHandler
-	releaseHandler = ReleaseHandler(exporter, stop_after=options.n, ignore_missing_tags = options.ignore_unknown_tags)
+	releaseHandler = ReleaseHandler(exporter, stop_after=options.n, ignore_missing_tags=options.ignore_unknown_tags)
 	parser.setContentHandler(releaseHandler)
 	try:
 		if release_file.endswith(".gz"):
@@ -156,14 +158,14 @@ def parseMasters(parser, exporter):
 		master_file = in_file
 
 	if master_file is None:
-		#print("No masters file specified.")
+		# print("No masters file specified.")
 		return
 	elif not path.exists(master_file):
-		#print("File %s doesn't exist:" % master_file)
+		# print("File %s doesn't exist:" % master_file)
 		return
 
 	from discogsmasterparser import MasterHandler
-	masterHandler = MasterHandler(exporter, stop_after=options.n, ignore_missing_tags = options.ignore_unknown_tags)
+	masterHandler = MasterHandler(exporter, stop_after=options.n, ignore_missing_tags=options.ignore_unknown_tags)
 	parser.setContentHandler(masterHandler)
 	try:
 		if master_file.endswith(".gz"):
@@ -173,7 +175,6 @@ def parseMasters(parser, exporter):
 			parser.parse(master_file)
 	except ParserStopError as pse:
 		print("Parsed %d masters then stopped as requested." % pse.records_parsed)
-
 
 
 def select_exporter(options):
@@ -186,6 +187,7 @@ def select_exporter(options):
 	# should I be throwing an exception here?
 	return exporters['json']
 
+
 def make_exporter(options):
 	exp_module = select_exporter(options)
 
@@ -196,7 +198,6 @@ def make_exporter(options):
 
 	data_quality = list(x.strip().lower() for x in (options.data_quality or '').split(',') if x)
 	return m(options.params, data_quality=data_quality)
-
 
 
 def main(argv):
@@ -213,7 +214,7 @@ that --params is used, e.g.:
 --output couchdb
 --params "http://localhost:5353/"
 '''
-			)
+	)
 	opt_parser.add_argument('-n', type=int, help='Number of records to parse', default=0)
 	opt_parser.add_argument('-d', '--date', help='Date of release. For example 20110301')
 	opt_parser.add_argument('-o', '--output', choices=exporters.keys(), default='json', help='What to output to')
@@ -237,7 +238,7 @@ that --params is used, e.g.:
 		parseReleases(parser, exporter)
 		parseMasters(parser, exporter)
 	finally:
-		exporter.finish(completely_done = True)
+		exporter.finish(completely_done=True)
 
 if __name__ == "__main__":
 	main(sys.argv[1:])

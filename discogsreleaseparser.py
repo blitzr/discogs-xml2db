@@ -50,7 +50,7 @@ class ReleaseHandler(xml.sax.handler.ContentHandler):
 							'formats',
 							'genre',
 							'genres',
-							#'indentifiers', 'identifier',
+							# 'indentifiers', 'identifier',
 							'image',
 							'images',
 							'join',
@@ -73,7 +73,7 @@ class ReleaseHandler(xml.sax.handler.ContentHandler):
 							'tracks',
 							'url',
 							'urls',
-							)
+		)
 		self.release = None
 		self.buffer = ''
 		self.unknown_tags = []
@@ -83,11 +83,11 @@ class ReleaseHandler(xml.sax.handler.ContentHandler):
 		self.stack = []
 
 	def startElement(self, name, attrs):
-		if not name in self.knownTags:
+		if name not in self.knownTags:
 			if not self.ignore_missing_tags:
 				print("Error: Unknown Release element '%s'." % name)
 				sys.exit()
-			elif not name in self.unknown_tags:
+			elif name not in self.unknown_tags:
 				self.unknown_tags.append(name)
 		self.stack.append(name)
 
@@ -131,7 +131,6 @@ class ReleaseHandler(xml.sax.handler.ContentHandler):
 		# Barcode
 		elif name == 'identifier' and attrs['type'] == 'Barcode':
 			self.release.barcode = attrs['value']
-
 
 	def characters(self, data):
 		self.buffer += data
@@ -267,7 +266,6 @@ class ReleaseHandler(xml.sax.handler.ContentHandler):
 			if len(self.buffer) != 0:
 				self.release.tracklist[-1].extraartists[-1].anv = self.buffer
 
-
 		# Release artist anv
 		elif name == 'anv' and 'artist' in self.stack and 'track' not in self.stack and 'extraartists' not in self.stack:
 			if len(self.buffer) != 0:
@@ -349,11 +347,11 @@ class ReleaseHandler(xml.sax.handler.ContentHandler):
 		self.buffer = ''
 
 	def endDocument(self):
-		#print([genre for genre in genres])
-		#print([style for style in styles])
-		#print([format for format in formats])
-		#print([dsc for dsc in descriptions])
-		#print([j for j in joins])
-		#print([(role, roles[role]) for role in roles])
-		#print(len(roles))
+		# print([genre for genre in genres])
+		# print([style for style in styles])
+		# print([format for format in formats])
+		# print([dsc for dsc in descriptions])
+		# print([j for j in joins])
+		# print([(role, roles[role]) for role in roles])
+		# print(len(roles))
 		self.exporter.finish()
