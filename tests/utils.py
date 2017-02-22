@@ -19,11 +19,11 @@ def get_latest_dumps(grep=None):
             if name != 'Key':
                 self.buffer = ""
 
-        def characters(self,ch):
+        def characters(self, ch):
             if ch != '"':
                 self.buffer = ch
 
-        def endElement (self, name):
+        def endElement(self, name):
             if name == 'Key' and self.buffer.endswith('.xml.gz'):
                 self.urls.append("http://discogs-data.s3-us-west-2.amazonaws.com/" + self.buffer)
                 self.buffer = ""
